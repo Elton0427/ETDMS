@@ -1,0 +1,106 @@
+{
+    "name": "etdms_full",
+    "phase": "train",
+    "gpu_ids": [0],
+    "path": {
+        "log": "logs/etdms",
+        "tb_logger": "tb_logger/etdms",
+        "results": "results/etdms",
+        "checkpoint": "checkpoint/etdms",
+        "resume_state": null
+    },
+    "datasets": {
+        "train": {
+            "name": "SEM_Full_Train",
+            "mode": "LRHR",
+            "dataroot": "dataset/etdms_train",
+            "datatype": "img",
+            "l_resolution": 64,
+            "r_resolution": 256,
+            "batch_size": 8,
+            "num_workers": 8,
+            "use_shuffle": true,
+            "data_len": -1,
+            "need_LR": true
+        },
+        "val": {
+            "name": "SEM_Full_Val",
+            "mode": "LRHR",
+            "dataroot": "dataset/etdms_val",
+            "datatype": "img",
+            "l_resolution": 64,
+            "r_resolution": 256,
+            "need_LR": true,
+            "data_len": 5
+        }
+    },
+    "stage1": {
+        "which_model_G": "swinir",
+        "swinir": {
+            "img_size": 64,
+            "in_chans": 3,
+            "window_size": 8,
+            "img_range": 1.0,
+            "depths": [6, 6, 6, 6, 6, 6],
+            "embed_dim": 180,
+            "num_heads": [6, 6, 6, 6, 6, 6],
+            "mlp_ratio": 2,
+            "upscale": 1,
+            "resi_connection": "1conv",
+            "pretrained": null
+        }
+    },
+    "stage2": {
+        "which_model_G": "clsr",
+        "finetune_norm": false,
+        "enet": {
+            "in_channel": 3,
+            "out_channel": 3,
+            "inner_channel": 32,
+            "norm_groups": 8,
+            "channel_multiplier": [12, 12],
+            "attn_res": 2,
+            "res_blocks": 2,
+            "dropout": 0.1
+        },
+        "beta_schedule": {
+            "train": {
+                "schedule": "linear",
+                "n_timestep": 2000,
+                "linear_start": 5e-4,
+                "linear_end": 2e-2
+            },
+            "val": {
+                "schedule": "linear",
+                "n_timestep": 2000,
+                "linear_start": 5e-4,
+                "linear_end": 2e-2,
+                "sampling_timesteps": 2000,
+                "ddim_sampling_eta": 0.0
+            }
+        },
+        "diffusion": {
+            "image_size": 256,
+            "channels": 3,
+            "conditional": true
+        }
+    },
+    "train": {
+        "n_iter": 1000000,
+        "val_freq": 50000,
+        "save_checkpoint_freq": 50000,
+        "print_freq": 200,
+        "optimizer": {
+            "type": "adam",
+            "lr": 1e-4
+        },
+        "ema_scheduler": {
+            "step_start_ema": 5000,
+            "update_ema_every": 1,
+            "ema_decay": 0.9999
+        }
+    },
+    "wandb": {
+        "project": "etdms_full"
+    }
+}

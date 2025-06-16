@@ -1,0 +1,66 @@
+{
+    "name": "swinir_denoising",
+    "phase": "train",
+    "gpu_ids": [0],
+    "path": {
+        "log": "logs/swinir",
+        "tb_logger": "tb_logger/swinir",
+        "results": "results/swinir",
+        "checkpoint": "checkpoint/swinir",
+        "resume_state": null
+    },
+    "datasets": {
+        "train": {
+            "name": "SEM_Denoising_Train",
+            "mode": "LRHR",
+            "dataroot": "dataset/stage1_train",
+            "datatype": "img",
+            "l_resolution": 64,
+            "r_resolution": 64,
+            "batch_size": 8,
+            "num_workers": 8,
+            "use_shuffle": true,
+            "data_len": -1,
+            "need_LR": true
+        },
+        "val": {
+            "name": "SEM_Denoising_Val",
+            "mode": "LRHR",
+            "dataroot": "dataset/stage1_val",
+            "datatype": "img",
+            "l_resolution": 64,
+            "r_resolution": 64,
+            "need_LR": true,
+            "data_len": 5
+        }
+    },
+    "model": {
+        "which_model_G": "swinir",
+        "swinir": {
+            "img_size": 64,
+            "in_chans": 3, 
+            "window_size": 8,
+            "img_range": 1.0,
+            "depths": [6, 6, 6, 6, 6, 6],
+            "embed_dim": 180,
+            "num_heads": [6, 6, 6, 6, 6, 6],
+            "mlp_ratio": 2,
+            "upscale": 1,
+            "resi_connection": "1conv",
+            "pretrained": null
+        }
+    },
+    "train": {
+        "n_iter": 500000,
+        "val_freq": 25000,
+        "save_checkpoint_freq": 25000,
+        "print_freq": 200,
+        "optimizer": {
+            "type": "adam",
+            "lr": 2e-4
+        }
+    },
+    "wandb": {
+        "project": "swinir_denoising"
+    }
+}
